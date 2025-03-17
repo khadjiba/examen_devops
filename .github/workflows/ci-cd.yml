@@ -1,0 +1,32 @@
+name: CI/CD Pipeline - DockerHub
+
+on:
+  push:
+    branches:
+      - main  # Déclencher l'action à chaque push sur la branche principale
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🛎️ Récupérer le code du repo
+        uses: actions/checkout@v3
+
+      - name: 🐳 Se connecter à DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - name: 🔨 Construire l'image Docker
+        run: docker build -t khadjiratou/my-http-server:latest .
+
+      - name: 🏷️ Taguer l’image Docker
+        run: docker tag khadjiratou/my-http-server:latest khadjiratou/my-http-server:v1.0
+
+      - name: 🚀 Pousser l'image sur DockerHub
+        run: |
+          docker push khadjiratou/my-http-server:latest
+          docker push khadjiratou/my-http-server:v1.0
+
